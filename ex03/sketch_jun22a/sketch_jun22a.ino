@@ -3,10 +3,10 @@ unsigned long prevTime = 0;
 unsigned long curTime;
 
 // 时序定义
-const unsigned long shortFlash = 100;
-const unsigned long longFlash = 300;
-const unsigned long gap = 500;
-const unsigned long sosWait = 2000;
+const unsigned long shortFlash = 300;
+const unsigned long longFlash = 900;
+const unsigned long gap = 200;
+const unsigned long sosWait = 1200;
 
 int stage = 0;
 bool lightOn = false;
