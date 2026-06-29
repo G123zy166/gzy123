@@ -1,33 +1,29 @@
-const int ledPin = 2;
-unsigned long prevTime = 0;
-unsigned long curTime;
+#define TOUCH_PIN T0
+#define LED_PIN 2
 
-// 时序定义
-const unsigned long shortFlash = 300;
-const unsigned long longFlash = 900;
-const unsigned long gap = 200;
-const unsigned long sosWait = 1200;
-
-int stage = 0;
-bool lightOn = false;
+bool ledState = false;
+bool lastTouch = false;
+unsigned long debounceTime = 0;
+const unsigned long debounceDelay = 50;
+int touchThreshold = 30;
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+  Serial.begin(115200);
 }
 
 void loop() {
-  curTime = millis();
-  if (curTime - prevTime < (lightOn ? (stage%2?shortFlash:longFlash) : gap)) return;
-  prevTime = curTime;
-  lightOn = !lightOn;
-  digitalWrite(ledPin, lightOn);
+  unsigned long now = millis();
+  int touchVal = touchRead(TOUCH_PIN);
+  bool currTouch = (touchVal < touchThreshold);
 
-  if (!lightOn) {
-    stage++;
-    // 完整SOS流程：3短 3长 3短，共18个阶段
-    if (stage >= 18) {
-      stage = 0;
-      delay(sosWait); // 整套结束长停顿
+  if (now - debounceTime > debounceDelay) {
+    if (currTouch && !lastTouch) {
+      ledState = !ledState;
+      digitalWrite(LED_PIN, ledState ? HIGH : LOW);
+      debounceTime = now;
     }
   }
+  lastTouch = currTouch;
 }
